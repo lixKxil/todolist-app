@@ -1,57 +1,44 @@
-import Image from 'next/image';
 'use client';
 import { FormEvent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import List from './components/List';
-import { message, Button, Modal } from 'antd';
+import { message, Modal } from 'antd';
 
 export default function Home() {
   const [todo, setTodo] = useState('');
-  const [list, setList] = useState<
-    Array<{ id: string; title: string; time: string }>
-  >([]);
+  const [list, setList] = useState<{ id: string; title: string; time: string }[]>([]);
   const [checkEditItem, setEditItem] = useState(false);
   const [editId, setEditId] = useState('');
 
-  function submitData(event: FormEvent<HTMLFormElement>): void {
+  const submitData = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     if (!todo) {
       message.error('กรุณาป้อนข้อมูลที่จะเพิ่ม');
     } else {
-      const newItem = {
-        id: uuidv4(),
-        title: todo,
-        time: new Date().toLocaleString(),
-      };
+      const newItem = { id: uuidv4(), title: todo, time: new Date().toLocaleString() };
       setList([...list, newItem]);
       message.success('บันทึกข้อมูลสำเร็จ');
     }
     setTodo('');
-  }
+  };
 
-  function removeItem(id: string) {
-    const resultRemoveItem = list.filter((item) => item.id !== id);
-    setList(resultRemoveItem);
+  const removeItem = (id: string) => {
+    setList(list.filter(item => item.id !== id));
     message.error('ลบข้อมูลสำเร็จ');
-  }
+  };
 
-  function editItem(id: string) {
+  const editItem = (id: string) => {
     setEditItem(true);
     setEditId(id);
-    const resultEditItem = list.find((item) => item.id === id);
+    const resultEditItem = list.find(item => item.id === id);
     if (resultEditItem) {
       setTodo(resultEditItem.title);
     }
-  }
+  };
 
-  function updeta() {
+  const updeta = () => {
     if (checkEditItem && todo) {
-      const result = list.map((item) => {
-        if (item.id === editId) {
-          return { ...item, title: todo, time: new Date().toLocaleString() };
-        }
-        return item;
-      });
+      const result = list.map(item => (item.id === editId ? { ...item, title: todo, time: new Date().toLocaleString() } : item));
       setList(result);
       setEditItem(false);
       setTodo('');
@@ -61,12 +48,12 @@ export default function Home() {
       setTodo('');
       message.error('แก้ไขข้อมูลไม่สำเร็จ');
     }
-  }
+  };
 
-  function handleCancel() {
+  const handleCancel = () => {
     setEditItem(false);
     setTodo('');
-  }
+  };
 
   return (
     <>
@@ -76,13 +63,13 @@ export default function Home() {
           <input
             type='text'
             className='border border-gray-300 rounded-md p-2 w-80 text-black'
-            onChange={(e) => setTodo(e.target.value)}
+            onChange={e => setTodo(e.target.value)}
             value={todo}
             maxLength={30}
           />
           <button
             className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
-            onClick={() => updeta()}
+            onClick={updeta}
           >
             แก้ไข
           </button>
@@ -97,7 +84,7 @@ export default function Home() {
             <input
               type='text'
               className='border border-gray-300 rounded-md p-2 w-80 text-black'
-              onChange={(e) => setTodo(e.target.value)}
+              onChange={e => setTodo(e.target.value)}
               value={todo}
               maxLength={30}
             />
@@ -110,16 +97,9 @@ export default function Home() {
           </div>
         </form>
         <section>
-          {list.map((data, index) => {
-            return (
-              <List
-                key={index}
-                {...data}
-                removeItem={removeItem}
-                editItem={editItem}
-              />
-            );
-          })}
+          {list.map((data, index) => (
+            <List key={index} {...data} removeItem={removeItem} editItem={editItem} />
+          ))}
         </section>
       </section>
     </>
