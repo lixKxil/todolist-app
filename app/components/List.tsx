@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, List, Modal } from 'antd';
+
 interface ListItem {
   id: string;
   title: string;
@@ -8,33 +10,95 @@ interface ListItem {
   editItem: (id: string) => void;
 }
 
-const List: React.FC<ListItem> = ({
+const ListData: React.FC<ListItem> = ({
   id,
   title,
   time,
   removeItem,
   editItem,
 }) => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    if (windowWidth <= 450) setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   return (
-    <div className='flex items-center justify-between mt-2 p-2 bg-gray-100 shadow-md rounded-md text-lg'>
-      <p className='text-black'>{title}</p>
-      <div className='flex ml-auto'>
-        <p className='text-black mt-2 mr-2'>{time}</p>
-        <button
-          className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
-          onClick={() => editItem(id)}
-        >
-          <EditOutlined />
-        </button>
-        <button
-          className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
-          onClick={() => removeItem(id)}
-        >
-          <DeleteOutlined />
-        </button>
-      </div>
-    </div>
+    <section>
+      <List
+        className='bg-zinc-100 mt-2 rounded-md'
+        itemLayout='horizontal'
+        dataSource={[{ id, title, time }]}
+        renderItem={(item) => (
+          <List.Item
+            onClick={showModal}
+            actions={
+              windowWidth >= 450
+                ? [
+                    <button
+                      className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+                      onClick={() => editItem(id)}
+                    >
+                      <EditOutlined />
+                    </button>,
+                    <button
+                      className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+                      onClick={() => removeItem(id)}
+                    >
+                      <DeleteOutlined />
+                    </button>,
+                  ]
+                : []
+            }
+          >
+            <List.Item.Meta
+              className='ml-4 text-base'
+              title={item.title}
+              description={item.time}
+            />
+          </List.Item>
+        )}
+      />
+      <Modal open={isModalVisible} onCancel={handleCancel} footer={null}>
+        <p>
+          <strong>Title:</strong> {title}
+        </p>
+        <p>
+          <strong>Time:</strong> {time}
+        </p>
+        <div className='flex justify-end'>
+          <button
+            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            onClick={() => editItem(id)}
+          >
+            <EditOutlined />
+          </button>
+          <button
+            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            onClick={() => removeItem(id)}
+          >
+            <DeleteOutlined />
+          </button>
+        </div>
+      </Modal>
+    </section>
   );
 };
 
-export default List;
+export default ListData;

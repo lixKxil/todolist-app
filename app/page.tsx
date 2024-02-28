@@ -1,12 +1,14 @@
 'use client';
 import { FormEvent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import List from './components/List';
+import ListData from './components/List';
 import { message, Modal } from 'antd';
 
 export default function Home() {
   const [todo, setTodo] = useState('');
-  const [list, setList] = useState<{ id: string; title: string; time: string }[]>([]);
+  const [list, setList] = useState<
+    { id: string; title: string; time: string }[]
+  >([]);
   const [checkEditItem, setEditItem] = useState(false);
   const [editId, setEditId] = useState('');
 
@@ -15,7 +17,15 @@ export default function Home() {
     if (!todo) {
       message.error('กรุณาป้อนข้อมูลที่จะเพิ่ม');
     } else {
-      const newItem = { id: uuidv4(), title: todo, time: new Date().toLocaleString() };
+      const currentDate = new Date();
+      const formattedDate = `${currentDate.getDate()}/${
+        currentDate.getMonth() + 1
+      }/${currentDate.getFullYear()}, ${currentDate.toLocaleTimeString()}`;
+      const newItem = {
+        id: uuidv4(),
+        title: todo,
+        time: formattedDate,
+      };
       setList([...list, newItem]);
       message.success('บันทึกข้อมูลสำเร็จ');
     }
@@ -23,14 +33,14 @@ export default function Home() {
   };
 
   const removeItem = (id: string) => {
-    setList(list.filter(item => item.id !== id));
+    setList(list.filter((item) => item.id !== id));
     message.error('ลบข้อมูลสำเร็จ');
   };
 
   const editItem = (id: string) => {
     setEditItem(true);
     setEditId(id);
-    const resultEditItem = list.find(item => item.id === id);
+    const resultEditItem = list.find((item) => item.id === id);
     if (resultEditItem) {
       setTodo(resultEditItem.title);
     }
@@ -38,7 +48,15 @@ export default function Home() {
 
   const updeta = () => {
     if (checkEditItem && todo) {
-      const result = list.map(item => (item.id === editId ? { ...item, title: todo, time: new Date().toLocaleString() } : item));
+      const currentDate = new Date();
+      const formattedDate = `${currentDate.getDate()}/${
+        currentDate.getMonth() + 1
+      }/${currentDate.getFullYear()}, ${currentDate.toLocaleTimeString()}`;
+      const result = list.map((item) =>
+        item.id === editId
+          ? { ...item, title: todo, time: formattedDate }
+          : item
+      );
       setList(result);
       setEditItem(false);
       setTodo('');
@@ -63,12 +81,12 @@ export default function Home() {
           <input
             type='text'
             className='border border-gray-300 rounded-md p-2 w-80 text-black'
-            onChange={e => setTodo(e.target.value)}
+            onChange={(e) => setTodo(e.target.value)}
             value={todo}
-            maxLength={30}
+            maxLength={35}
           />
           <button
-            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2 whitespace-nowrap'
             onClick={updeta}
           >
             แก้ไข
@@ -76,21 +94,21 @@ export default function Home() {
         </div>
       </Modal>
       <section className='bg-white p-6 mx-auto mt-32 max-w-35rem rounded-lg max-w-screen-md'>
-        <h1 className='text-4xl leading-6 text-center text-black not-italic'>
+        <h1 className='text-4xl leading-6 text-center text-black font-semibold whitespace-nowrap'>
           Todolist App
         </h1>
         <form className='mt-4 flex flex-col items-center' onSubmit={submitData}>
           <div className='flex items-center justify-between'>
             <input
               type='text'
-              className='border border-gray-300 rounded-md p-2 w-80 text-black'
-              onChange={e => setTodo(e.target.value)}
+              className='border border-gray-300 rounded-md p-2 sm:w-80 md:w-96 lg:w-120 text-black'
+              onChange={(e) => setTodo(e.target.value)}
               value={todo}
-              maxLength={30}
+              maxLength={35}
             />
             <button
               type='submit'
-              className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+              className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2 whitespace-nowrap'
             >
               เพิ่มข้อมูล
             </button>
@@ -98,7 +116,12 @@ export default function Home() {
         </form>
         <section>
           {list.map((data, index) => (
-            <List key={index} {...data} removeItem={removeItem} editItem={editItem} />
+            <ListData
+              key={index}
+              {...data}
+              removeItem={removeItem}
+              editItem={editItem}
+            />
           ))}
         </section>
       </section>
