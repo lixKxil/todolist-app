@@ -3,51 +3,125 @@ import Image from 'next/image';
 import { FormEvent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import List from './components/List';
-import { message, Button } from 'antd';
+import { message, Button, Modal } from 'antd';
 
 export default function Home() {
   const [todo, setTodo] = useState('');
-  const [list, setList] = useState<Array<{ id: string; title: string }>>([]);
+  const [list, setList] = useState<
+    Array<{ id: string; title: string; time: string }>
+  >([]);
+  const [checkEditItem, setEditItem] = useState(false);
+  const [editId, setEditId] = useState('');
 
   function submitData(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (!todo) {
-      message.error('กรุณาป้อนหัวข้อที่จะเพิ่ม');
+      message.error('กรุณาป้อนข้อมูลที่จะเพิ่ม');
     } else {
-      const newItem = { id: uuidv4(), title: todo };
+      const newItem = {
+        id: uuidv4(),
+        title: todo,
+        time: new Date().toLocaleString(),
+      };
       setList([...list, newItem]);
-      message.success('บันทึกหัวข้อสำเร็จ');
+      message.success('บันทึกข้อมูลสำเร็จ');
     }
     setTodo('');
   }
 
+  function removeItem(id: string) {
+    const resultRemoveItem = list.filter((item) => item.id !== id);
+    setList(resultRemoveItem);
+    message.error('ลบข้อมูลสำเร็จ');
+  }
+
+  function editItem(id: string) {
+    setEditItem(true);
+    setEditId(id);
+    const resultEditItem = list.find((item) => item.id === id);
+    if (resultEditItem) {
+      setTodo(resultEditItem.title);
+    }
+  }
+
+  function updeta() {
+    if (checkEditItem && todo) {
+      const result = list.map((item) => {
+        if (item.id === editId) {
+          return { ...item, title: todo, time: new Date().toLocaleString() };
+        }
+        return item;
+      });
+      setList(result);
+      setEditItem(false);
+      setTodo('');
+      message.success('แก้ไขข้อมูลสำเร็จ');
+    } else {
+      setEditItem(false);
+      setTodo('');
+      message.error('แก้ไขข้อมูลไม่สำเร็จ');
+    }
+  }
+
+  function handleCancel() {
+    setEditItem(false);
+    setTodo('');
+  }
+
   return (
-    <section className='bg-white p-6 mx-auto mt-32 max-w-35rem rounded-lg max-w-screen-md'>
-      <h1 className='text-4xl leading-6 text-center text-black'>
-        Todolist App
-      </h1>
-      <form className='mt-4 flex flex-col items-center' onSubmit={submitData}>
-        <div className='flex items-center justify-between'>
+    <>
+      <Modal open={checkEditItem} footer={null} onCancel={handleCancel}>
+        <p className='text-3xl font-bold'>แก้ไขข้อมูล</p>
+        <div className='mt-2'>
           <input
             type='text'
-            className='border border-gray-300 rounded-md p-2 w-80 text-black' 
+            className='border border-gray-300 rounded-md p-2 w-80 text-black'
             onChange={(e) => setTodo(e.target.value)}
             value={todo}
+            maxLength={30}
           />
-          <button type="submit" className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'>
-            เพิ่มข้อมูล
+          <button
+            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            onClick={() => updeta()}
+          >
+            แก้ไข
           </button>
         </div>
-      </form>
-      <section className='items-center'>
-        {list.map((data, index) => {
-          return <List key={index} {...data} />;
-        })}
+      </Modal>
+      <section className='bg-white p-6 mx-auto mt-32 max-w-35rem rounded-lg max-w-screen-md'>
+        <h1 className='text-4xl leading-6 text-center text-black not-italic'>
+          Todolist App
+        </h1>
+        <form className='mt-4 flex flex-col items-center' onSubmit={submitData}>
+          <div className='flex items-center justify-between'>
+            <input
+              type='text'
+              className='border border-gray-300 rounded-md p-2 w-80 text-black'
+              onChange={(e) => setTodo(e.target.value)}
+              value={todo}
+              maxLength={30}
+            />
+            <button
+              type='submit'
+              className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            >
+              เพิ่มข้อมูล
+            </button>
+          </div>
+        </form>
+        <section>
+          {list.map((data, index) => {
+            return (
+              <List
+                key={index}
+                {...data}
+                removeItem={removeItem}
+                editItem={editItem}
+              />
+            );
+          })}
+        </section>
       </section>
-    </section>
+    </>
   );
 }
-
-{/* <Button type="primary"  htmlType='submit'>
-            เพิ่มข้อมูล
-          </Button> */}

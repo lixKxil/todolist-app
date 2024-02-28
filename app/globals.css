@@ -16,6 +16,17 @@
   }
 }
 
+@font-face {
+  font-family: 'YourCustomFont';
+  src: url('../styles/fonts/Prompt-Regular.ttf');
+  font-weight: bold;
+}
+
+* {
+  font-family: 'YourCustomFont', sans-serif !important;
+  font-weight: normal;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
