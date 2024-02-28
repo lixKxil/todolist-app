@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, List, Modal } from 'antd';
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
+import { List, Modal } from 'antd';
 
 interface ListItem {
   id: string;
@@ -19,12 +23,18 @@ const ListData: React.FC<ListItem> = ({
 }) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDone, setIsDone] = useState(false);
 
   const showModal = () => {
     if (windowWidth <= 450) setIsModalVisible(true);
   };
 
   const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const clickDone = () => {
+    setIsDone(!isDone);
     setIsModalVisible(false);
   };
 
@@ -42,12 +52,14 @@ const ListData: React.FC<ListItem> = ({
   return (
     <section>
       <List
-        className='bg-zinc-100 mt-2 rounded-md'
+        className={`mt-2 rounded-md ${
+          isDone ? 'bg-green-400' : 'bg-zinc-100'
+        }`}
         itemLayout='horizontal'
         dataSource={[{ id, title, time }]}
         renderItem={(item) => (
           <List.Item
-            onClick={showModal}
+            onClick={windowWidth <= 450 ? showModal : clickDone}
             actions={
               windowWidth >= 450
                 ? [
@@ -83,6 +95,12 @@ const ListData: React.FC<ListItem> = ({
           <strong>Time:</strong> {time}
         </p>
         <div className='flex justify-end'>
+          <button
+            className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
+            onClick={() => clickDone()}
+          >
+            <CheckCircleOutlined />
+          </button>
           <button
             className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
             onClick={() => editItem(id)}
