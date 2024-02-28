@@ -77,7 +77,7 @@ export default function Home() {
     <>
       <Modal open={checkEditItem} footer={null} onCancel={handleCancel}>
         <p className='text-3xl font-bold'>แก้ไขข้อมูล</p>
-        <div className='mt-2'>
+        <div className='mt-2 flex justify-end'>
           <input
             type='text'
             className='border border-gray-300 rounded-md p-2 w-80 text-black'

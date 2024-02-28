@@ -33,6 +33,16 @@ const ListData: React.FC<ListItem> = ({
     setIsModalVisible(false);
   };
 
+  const handleEdit = (id: string) => {
+    editItem(id);
+    setIsModalVisible(false);
+  };
+
+  const handleRemove = (id: string) => {
+    removeItem(id);
+    setIsModalVisible(false);
+  };
+
   const clickDone = () => {
     setIsDone(!isDone);
     setIsModalVisible(false);
@@ -52,9 +62,7 @@ const ListData: React.FC<ListItem> = ({
   return (
     <section>
       <List
-        className={`mt-2 rounded-md ${
-          isDone ? 'bg-green-400' : 'bg-zinc-100'
-        }`}
+        className={`mt-2 rounded-md ${isDone ? 'bg-green-400' : 'bg-zinc-100'}`}
         itemLayout='horizontal'
         dataSource={[{ id, title, time }]}
         renderItem={(item) => (
@@ -103,13 +111,13 @@ const ListData: React.FC<ListItem> = ({
           </button>
           <button
             className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
-            onClick={() => editItem(id)}
+            onClick={() => handleEdit(id)}
           >
             <EditOutlined />
           </button>
           <button
             className='px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer mr-2'
-            onClick={() => removeItem(id)}
+            onClick={() => handleRemove(id)}
           >
             <DeleteOutlined />
           </button>
